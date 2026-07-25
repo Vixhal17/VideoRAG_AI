@@ -12,7 +12,6 @@ def load_model():
 
     if _model is None:
 
-        # Automatically choose GPU if available
         if torch.cuda.is_available():
             device = "cuda"
             compute_type = "float16"
@@ -33,31 +32,31 @@ def load_model():
     return _model
 
 
-def transcribe_chunk(chunk_path: str, translate: bool = False) -> str:
+def transcribe_chunk(chunk_path: str) -> str:
     model = load_model()
-
-    task = "translate" if translate else "transcribe"
 
     segments, info = model.transcribe(
         chunk_path,
-        task=task,
-        language=None,      # Auto detect language
-        beam_size=1,        # Faster decoding
-        vad_filter=True     # Skip silent regions
+        task="translate",      # Always output English
+        language=None,         # Auto-detect input language
+        beam_size=5,           # Better accuracy
+        vad_filter=True,
+        temperature=0.0,
     )
+
+    print(f"Detected language: {info.language}")
 
     text = "".join(segment.text for segment in segments)
 
     return text
 
 
-def transcribe_all(chunks: list, translate: bool = False):
+def transcribe_all(chunks: list):
     full_transcript = ""
 
     for i, chunk in enumerate(chunks):
         print(f"🎤 Transcribing chunk {i + 1}/{len(chunks)}...")
-        text = transcribe_chunk(chunk, translate)
-
+        text = transcribe_chunk(chunk)
         full_transcript += text + " "
 
     print("✅ Transcription completed!")
