@@ -1,0 +1,67 @@
+# ── AI Video Assistant ── requirements.txt ────────────────────────────────────
+# Python >= 3.10 recommended
+
+# ── Audio / Video Acquisition ─────────────────────────────────────────────────
+yt-dlp>=2024.4.9                  # Download videos/audio from YouTube
+moviepy>=2.1.1                    # Video editing and audio extraction
+opencv-python>=4.10.0             # Video processing
+pydub>=0.25.1                     # Audio manipulation
+ffmpeg-python>=0.2.0              # FFmpeg bindings
+
+# ── Speech-to-Text ────────────────────────────────────────────────────────────
+openai-whisper>=20231117          # Local Whisper
+torch>=2.2.0
+torchaudio>=2.2.0
+
+# Faster Whisper (Recommended)
+faster-whisper>=1.0.3
+ctranslate2>=4.4.0
+
+# ── OCR (Optional) ────────────────────────────────────────────────────────────
+easyocr>=1.7.1
+Pillow>=10.4.0
+
+# ── Translation (Optional) ────────────────────────────────────────────────────
+deep-translator>=1.11.4
+
+# ── LangChain + Mistral ───────────────────────────────────────────────────────
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+langchain-mistralai>=0.2.0
+mistralai>=1.2.0
+
+# ── RAG Pipeline ──────────────────────────────────────────────────────────────
+chromadb>=0.5.0
+sentence-transformers>=3.0.0
+langchain-huggingface>=0.1.0
+huggingface-hub>=0.23.0
+faiss-cpu>=1.8.0                  # Optional alternative vector database
+tiktoken>=0.7.0
+
+# ── Text Processing ───────────────────────────────────────────────────────────
+transformers>=4.45.0
+accelerate>=0.34.0
+nltk>=3.9
+
+# ── Streamlit UI ──────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+streamlit-extras>=0.4.0
+watchdog>=4.0.0
+
+# ── PDF Export ────────────────────────────────────────────────────────────────
+reportlab>=4.2.0
+fpdf2>=2.7.9
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0
+numpy>=1.26.0
+pandas>=2.2.2
+requests>=2.32.0
+tqdm>=4.66.0
+rich>=13.9.0
+loguru>=0.7.2
+
+# ── Development ───────────────────────────────────────────────────────────────
+black>=24.4.2
+pytest>=8.2.0
