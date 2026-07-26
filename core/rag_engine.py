@@ -40,14 +40,24 @@ def build_rag_chain(transcript : str):
   )
 
   # full LCEL Rag Pipeline
+  print(type(retriever))
+  print(type(prompt))
+  print(type(llm))
+  a = {
+    "context": retriever | RunnableLambda(format_docs),
+    "question": RunnablePassthrough(),
+    }
 
-  rag_chain = (
-     {
-      "context" : retriever | RunnableLambda(format_docs),
-      "question" : RunnablePassthrough()
-      }
-      |prompt | llm | StrOutputParser()
-  )
+  print("Step 1 OK")
+
+  b = a | prompt
+  print("Step 2 OK")
+
+  c = b | llm
+  print("Step 3 OK")
+
+  rag_chain = c | StrOutputParser()
+  print("Step 4 OK")
 
   return rag_chain
 
@@ -92,11 +102,7 @@ def load_rag_chain():
 
 def ask_question(rag_chain, question: str) -> str:
     try:
-        print(f"Question: {question}")
-
         answer = rag_chain.invoke(question)
-
-        print(f"Answer: {answer}")
 
         return answer
 
