@@ -1,6 +1,4 @@
 import os
-import torch
-from faster_whisper import WhisperModel
 
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small")
 
@@ -11,6 +9,8 @@ def load_model():
     global _model
 
     if _model is None:
+        import torch
+        from faster_whisper import WhisperModel
 
         if torch.cuda.is_available():
             device = "cuda"

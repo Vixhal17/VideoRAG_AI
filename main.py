@@ -1,10 +1,18 @@
+import sys
+if sys.platform.startswith("win"):
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8")
+            except Exception:
+                pass
+
 from dotenv import load_dotenv
 from utils.audio_processor import process_input
 from core.transcriber import transcribe_all
 from core.summarize import summarize , generate_title
 from core.extractor import extract_action_items, extract_key_decision,extract_questions
 from core.rag_engine import build_rag_chain,ask_question
-import sys
 import traceback
 load_dotenv()
 

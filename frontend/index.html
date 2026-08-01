@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Assistant — Video Intelligence & Q&A</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Panel -->
+        <aside class="sidebar" id="app-sidebar">
+            <div class="brand">
+                <div class="logo">🎬</div>
+                <div>
+                    <h1 class="brand-name">AI Video</h1>
+                    <p class="brand-subtitle">Meeting Intelligence</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Input Form -->
+            <form id="analyze-form" class="form-container">
+                <div class="form-group">
+                    <label for="video-source">YouTube URL or Local File Path</label>
+                    <input type="text" id="video-source" required placeholder="https://youtube.com/watch?v=... or C:/path/to/meeting.mp4">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label for="language-select">Language</label>
+                        <select id="language-select">
+                            <option value="english">English</option>
+                            <option value="hinglish">Hinglish</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-analyse" class="btn btn-primary">
+                    <span class="btn-text">⚡ Analyse</span>
+                </button>
+            </form>
+
+            <hr>
+
+            <!-- Dynamic Pipeline Status Tracker -->
+            <div class="pipeline-tracker" id="pipeline-tracker-box">
+                <h3 class="section-subtitle">Pipeline Status</h3>
+                <ul class="timeline" id="pipeline-timeline">
+                    <li class="timeline-item" id="step-audio">
+                        <div class="status-marker"></div>
+                        <div class="step-details">
+                            <span class="step-title">Audio Processing</span>
+                            <span class="step-desc">Acquiring & formatting media</span>
+                        </div>
+                    </li>
+                    <li class="timeline-item" id="step-transcript">
+                        <div class="status-marker"></div>
+                        <div class="step-details">
+                            <span class="step-title">Transcription</span>
+                            <span class="step-desc">Transcribing audio via Whisper</span>
+                        </div>
+                    </li>
+                    <li class="timeline-item" id="step-title">
+                        <div class="status-marker"></div>
+                        <div class="step-details">
+                            <span class="step-title">Title Generation</span>
+                            <span class="step-desc">Synthesizing professional title</span>
+                        </div>
+                    </li>
+                    <li class="timeline-item" id="step-summary">
+                        <div class="status-marker"></div>
+                        <div class="step-details">
+                            <span class="step-title">Summarisation</span>
+                            <span class="step-desc">Generating map-reduce abstract</span>
+                        </div>
+                    </li>
+                    <li class="timeline-item" id="step-extract">
+                        <div class="status-marker"></div>
+                        <div class="step-details">
+                            <span class="step-title">Extraction</span>
+                            <span class="step-desc">Parsing tasks, decisions, & questions</span>
+                        </div>
+                    </li>
+                    <li class="timeline-item" id="step-rag">
+                        <div class="status-marker"></div>
+                        <div class="step-details">
+                            <span class="step-title">RAG Engine</span>
+                            <span class="step-desc">Indexing transcript vectors</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Display Content Area -->
+        <main class="main-content" id="app-main-content">
+            <!-- Hero Header -->
+            <header class="app-header">
+                <h2 class="hero-title" id="main-hero-title">AI Video Assistant</h2>
+                <p class="hero-sub" id="main-hero-sub">Transcribe · Summarise · Chat with your meetings</p>
+            </header>
+
+            <!-- State 1: Empty state (Landing View) -->
+            <section id="view-empty" class="view-state card active">
+                <div class="empty-state-container">
+                    <div class="empty-icon">🎬</div>
+                    <h3>Ready to Analyse</h3>
+                    <p>Paste a YouTube URL or local file path in the sidebar, select your language, and click <strong>Analyse</strong> to begin. The pipeline progress and results will populate here.</p>
+                    <div class="badges-row">
+                        <span class="badge badge-purple">Transcription</span>
+                        <span class="badge badge-cyan">Summarisation</span>
+                        <span class="badge badge-green">RAG Chat</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- State 2: Running Pipeline State -->
+            <section id="view-running" class="view-state card">
+                <div class="running-container">
+                    <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+                    <h3 id="running-step-label">Initializing Pipeline...</h3>
+                    <p id="running-sub-label">Setting up environment resources. Please follow along in the sidebar tracker.</p>
+                </div>
+            </section>
+
+            <!-- State 3: Analysis Done (Dashboard View) -->
+            <section id="view-dashboard" class="view-state">
+                <!-- Session Title Card -->
+                <div class="card session-title-card">
+                    <span class="card-title">📌 Session Title</span>
+                    <h3 id="dashboard-title-text" class="session-title-text">Meeting Title</h3>
+                </div>
+
+                <!-- Tabs Container -->
+                <div class="tabs-container">
+                    <div class="tabs-header" id="dashboard-tabs">
+                        <button class="tab-btn active" data-tab="tab-overview">📋 Overview</button>
+                        <button class="tab-btn" data-tab="tab-insights">🔑 Insights</button>
+                        <button class="tab-btn" data-tab="tab-transcript">📝 Transcript</button>
+                    </div>
+
+                    <!-- Tab Contents -->
+                    <div class="tabs-body">
+                        <!-- Overview Tab -->
+                        <div class="tab-pane active" id="tab-overview">
+                            <div class="tab-row">
+                                <div class="col-3-5">
+                                    <div class="card h-full">
+                                        <span class="card-title">📋 Summary</span>
+                                        <div class="card-content" id="overview-summary-text">...</div>
+                                    </div>
+                                </div>
+                                <div class="col-2-5">
+                                    <div class="card h-full">
+                                        <span class="card-title">✅ Action Items</span>
+                                        <div class="card-content" id="overview-actions-text">...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Insights Tab -->
+                        <div class="tab-pane" id="tab-insights">
+                            <div class="tab-row">
+                                <div class="col-1-2">
+                                    <div class="card h-full">
+                                        <span class="card-title">🔑 Key Decisions</span>
+                                        <div class="card-content" id="insights-decisions-text">...</div>
+                                    </div>
+                                </div>
+                                <div class="col-1-2">
+                                    <div class="card h-full">
+                                        <span class="card-title">❓ Open Questions</span>
+                                        <div class="card-content" id="insights-questions-text">...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transcript Tab -->
+                        <div class="tab-pane" id="tab-transcript">
+                            <div class="card">
+                                <span class="card-title">📝 Full Transcript</span>
+                                <div class="transcript-box" id="transcript-body-text">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RAG Chat Console -->
+                <div class="chat-section card">
+                    <span class="card-title">💬 Chat with your Meeting</span>
+                    <div class="chat-container" id="chat-messages-container">
+                        <div class="chat-welcome" id="chat-welcome-msg">
+                            <div class="chat-welcome-icon">💬</div>
+                            <p>Ask anything about your meeting transcript. The AI assistant will retrieve direct context.</p>
+                        </div>
+                    </div>
+                    <form id="chat-form" class="chat-input-bar">
+                        <input type="text" id="chat-input" required placeholder="What were the main decisions made?">
+                        <button type="submit" id="btn-chat-send" class="btn btn-primary btn-chat">Send →</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

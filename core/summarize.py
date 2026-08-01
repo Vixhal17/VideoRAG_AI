@@ -1,17 +1,9 @@
-from langchain_mistralai import ChatMistralAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.runnables import RunnablePassthrough, RunnableLambda
-
-import os
-
-def get_llm():
-  return ChatMistralAI(model = 'mistral-small-latest', mistral_api_key = os.getenv("MISTRAL_API_KEY"),temperature=0.3)
+from core.llm_factory import get_llm
 
 #  Split text to small small chunks
 
-def split_transcript(transcript: str) ->list:
+def split_transcript(transcript: str) -> list:
+  from langchain_text_splitters import RecursiveCharacterTextSplitter
   splitter = RecursiveCharacterTextSplitter(
     chunk_size = 3000,
     chunk_overlap = 200
@@ -20,6 +12,10 @@ def split_transcript(transcript: str) ->list:
   return splitter.split_text(transcript)
 
 def summarize(transcript: str) -> str:
+  from langchain_core.prompts import ChatPromptTemplate
+  from langchain_core.output_parsers import StrOutputParser
+  from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+
   llm = get_llm()
 
   map_prompt = ChatPromptTemplate.from_messages(
@@ -28,13 +24,11 @@ def summarize(transcript: str) -> str:
     ]
   )
 
-
   map_chain = map_prompt | llm | StrOutputParser()
 
   chunks = split_transcript(transcript)
 
   chunk_summaries = [map_chain.invoke({"text" : chunk}) for chunk in chunks]
-
 
   combined = "\n\n".join(chunk_summaries)
 
@@ -53,6 +47,10 @@ def summarize(transcript: str) -> str:
   return combined_chain.invoke(combined)
 
 def generate_title(transcript: str) -> str:
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_core.output_parsers import StrOutputParser
+    from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+
     llm = get_llm()
 
     title_prompt = ChatPromptTemplate.from_messages([

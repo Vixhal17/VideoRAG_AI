@@ -1,9 +1,5 @@
+from __future__ import annotations
 import os
-import torch
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.documents import Document
 
 CHROMA_DIR = "vector_db"
 COLLECTION_NAME = "video_transcript"
@@ -11,16 +7,28 @@ EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
 
 def get_embeddings():
-  device = "cuda" if torch.cuda.is_available() else "cpu"
-  return HuggingFaceEmbeddings(
-    model_name = EMBEDDING_MODEL,
-    model_kwargs = {"device" : device},
-    encode_kwargs={"normalize_embeddings": True}
+  from langchain_mistralai import MistralAIEmbeddings
+  return MistralAIEmbeddings(
+    model="mistral-embed",
+    mistral_api_key=os.getenv("MISTRAL_API_KEY")
   )
 
 
 def build_vector_store(transcript: str) -> Chroma:
+  from chromadb import PersistentClient
+  from langchain_text_splitters import RecursiveCharacterTextSplitter
+  from langchain_core.documents import Document
+  from langchain_chroma import Chroma
+
   print("📚 Building Vector Store...")
+
+  # Clear existing collection to avoid cross-video context pollution
+  try:
+      client = PersistentClient(path=CHROMA_DIR)
+      client.delete_collection(COLLECTION_NAME)
+      print("🧹 Cleared existing vector collection.")
+  except Exception as e:
+      print(f"⚠️ Note: Could not clear existing collection: {e}")
 
   splitter = RecursiveCharacterTextSplitter(
     chunk_size = 500,
@@ -47,7 +55,8 @@ def build_vector_store(transcript: str) -> Chroma:
   return vector_store
 
 
-def load_vector_store()->Chroma:
+def load_vector_store() -> Chroma:
+  from langchain_chroma import Chroma
   embeddings = get_embeddings()
 
   vector_store = Chroma(
