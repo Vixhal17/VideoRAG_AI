@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── DOM Elements ───
     const form = document.getElementById('analyze-form');
     const inputSource = document.getElementById('video-source');
-    const selectLanguage = document.getElementById('language-select');
     const btnAnalyse = document.getElementById('btn-analyse');
     
     const viewEmpty = document.getElementById('view-empty');
@@ -153,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const source = inputSource.value.trim();
-        const language = selectLanguage.value;
         
         if (!source) return;
         
@@ -165,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ source, language })
+                body: JSON.stringify({ source })
             });
             const result = await response.json();
             

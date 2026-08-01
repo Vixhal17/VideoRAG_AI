@@ -48,7 +48,6 @@ state_lock = threading.Lock()
 
 class AnalyzeRequest(BaseModel):
     source: str
-    language: str
 
 
 class ChatRequest(BaseModel):
