@@ -7,10 +7,13 @@ EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
 
 def get_embeddings():
+  api_key = os.getenv("MISTRAL_API_KEY")
+  if not api_key:
+      raise ValueError("MISTRAL_API_KEY environment variable is missing. Please configure it in your environment.")
   from langchain_mistralai import MistralAIEmbeddings
   return MistralAIEmbeddings(
     model="mistral-embed",
-    mistral_api_key=os.getenv("MISTRAL_API_KEY")
+    mistral_api_key=api_key
   )
 
 

@@ -58,17 +58,35 @@ def chunk_audio(wav_path: str, chunk_minutes: int = 10) -> list:
     return chunks
 
 
-def process_input(source: str) -> list:
+def cleanup_audio_files(files_to_clean: list):
+    """Safely delete temporary audio files to prevent disk exhaustion in deployment."""
+    if not files_to_clean:
+        return
+    for path in set(files_to_clean):
+        try:
+            if path and os.path.exists(path):
+                os.remove(path)
+                print(f"🧹 Cleaned up temporary file: {path}")
+        except Exception as e:
+            print(f"⚠️ Failed to remove temporary file {path}: {e}")
+
+
+def process_input(source: str) -> tuple[list, list]:
+    temp_files = []
     if source.startswith("http://") or source.startswith("https://"):
         print("Detected YouTube URL. Downloading audio...")
         wav_path = download_youtube_audio(source)
+        temp_files.append(wav_path)
     else:
         print("Detected local file. Converting to WAV...")
         wav_path = convert_to_wav(source)
+        temp_files.append(wav_path)
 
     print("Chunking audio...")
     chunks = chunk_audio(wav_path)
+    temp_files.extend(chunks)
 
     print(f"Audio ready - {len(chunks)} chunk(s) created.")
-    return chunks
+    return chunks, temp_files
+
 

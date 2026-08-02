@@ -8,7 +8,7 @@ if sys.platform.startswith("win"):
                 pass
 
 from dotenv import load_dotenv
-from utils.audio_processor import process_input
+from utils.audio_processor import process_input, cleanup_audio_files
 from core.transcriber import transcribe_all
 from core.summarize import summarize , generate_title
 from core.extractor import extract_action_items, extract_key_decision,extract_questions
@@ -19,9 +19,13 @@ load_dotenv()
 def run_pipeline(source: str)->dict:
   print("Starting AI Video Assistant")
 
-  chunks = process_input(source)
+  chunks, temp_files = process_input(source)
 
-  transcript = transcribe_all(chunks)
+  try:
+      transcript = transcribe_all(chunks)
+  finally:
+      cleanup_audio_files(temp_files)
+
   if not transcript.strip():
       raise ValueError("No speech was detected in the video.")
   

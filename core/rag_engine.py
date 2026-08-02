@@ -40,14 +40,14 @@ def _create_rag_chain(retriever):
 
 
 def build_rag_chain(transcript : str):
-  from core.vector_Store import build_vector_store, get_retriever
+  from core.vector_store import build_vector_store, get_retriever
   vector_store = build_vector_store(transcript)
   retriever = get_retriever(vector_store , k = 4)
   return _create_rag_chain(retriever)
 
 
 def load_rag_chain():
-    from core.vector_Store import load_vector_store, get_retriever
+    from core.vector_store import load_vector_store, get_retriever
     vector_store = load_vector_store()
     retriever = get_retriever(vector_store, k=4)
     return _create_rag_chain(retriever)

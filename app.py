@@ -17,7 +17,7 @@ import uvicorn
 from dotenv import load_dotenv
 
 # Pipeline imports
-from utils.audio_processor import process_input
+from utils.audio_processor import process_input, cleanup_audio_files
 from core.transcriber import transcribe_all
 from core.summarize import summarize, generate_title
 from core.extractor import extract_action_items, extract_key_decision, extract_questions
@@ -25,7 +25,19 @@ from core.rag_engine import build_rag_chain, ask_question
 
 load_dotenv()
 
-app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI(title="AI Video Assistant API", version="1.0.0")
+
+# Enable CORS for deployment flexibility
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Global Pipeline state
 pipeline_state = {
@@ -67,18 +79,23 @@ def set_pipeline_status(status: str, error: str = None):
 
 
 def run_pipeline_thread(source: str):
+    temp_files = []
     try:
         set_pipeline_status("running")
 
         # 1. Audio Processing
         update_step_status("audio", "active")
-        chunks = process_input(source)
+        chunks, temp_files = process_input(source)
         update_step_status("audio", "done")
 
         # 2. Transcription
         update_step_status("transcript", "active")
         transcript = transcribe_all(chunks)
         update_step_status("transcript", "done")
+
+        # Immediate cleanup of audio files after transcription to preserve disk space
+        cleanup_audio_files(temp_files)
+        temp_files = []
 
         # 3. Title Generation
         update_step_status("title", "active")
@@ -123,6 +140,16 @@ def run_pipeline_thread(source: str):
             for k, v in pipeline_state["steps"].items():
                 if v == "active":
                     pipeline_state["steps"][k] = "pending"
+    finally:
+        # Guarantee cleanup on unexpected error or crash
+        if temp_files:
+            cleanup_audio_files(temp_files)
+
+
+@app.get("/api/health")
+async def health():
+    return {"status": "healthy"}
+
 
 
 @app.post("/api/analyze")

@@ -28,6 +28,10 @@ COPY . .
 # Create cache directories and download folders
 RUN mkdir -p downloads vector_db cache/huggingface cache/whisper
 
+# Expose default port
+EXPOSE 8505
+
 # Command to run the application using uvicorn (binds to PORT env var or default to 8505)
 CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8505}"]
+
 
