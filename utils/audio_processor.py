@@ -6,7 +6,7 @@ DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 def download_youtube_audio(url: str) -> str:
-    output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
+    output_path = os.path.join(DOWNLOAD_DIR, "%(id)s.%(ext)s")
 
     ydl_opts = {
         "format": "bestaudio/best",
@@ -19,13 +19,38 @@ def download_youtube_audio(url: str) -> str:
             }
         ],
         "quiet": True,
+        "no_warnings": True,
+        # Bypass YouTube cloud datacenter bot detection using mobile player clients
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "ios", "mweb", "web"],
+                "player_skip": ["webpage", "configs", "js"],
+            }
+        },
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
     }
+
+    # Optional: Support for cookies on cloud hosting
+    cookies_path = os.getenv("YOUTUBE_COOKIES_PATH", "cookies.txt")
+    if os.path.exists(cookies_path):
+        ydl_opts["cookiefile"] = cookies_path
+    elif os.getenv("YOUTUBE_COOKIES"):
+        temp_cookie = os.path.join(DOWNLOAD_DIR, "yt_cookies.txt")
+        with open(temp_cookie, "w", encoding="utf-8") as cf:
+            cf.write(os.getenv("YOUTUBE_COOKIES"))
+        ydl_opts["cookiefile"] = temp_cookie
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
+        if "entries" in info:
+            info = info["entries"][0]
         filename = ydl.prepare_filename(info)
 
     return os.path.splitext(filename)[0] + ".wav"
+
 
 
 
